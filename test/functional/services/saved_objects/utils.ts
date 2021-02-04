@@ -7,6 +7,7 @@
  */
 
 import { join } from 'path';
+// @ts-ignore
 import { REPO_ROOT } from '@kbn/utils';
 // @ts-ignore
 import shell from 'shelljs';
