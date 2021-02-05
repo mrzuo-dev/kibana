@@ -46,6 +46,7 @@ jobs:
 
       - name: Report backport status
         run: |
-          GITHUB_TOKEN="${{ secrets.KIBANAMACHINE_TOKEN }}" gh api -X POST repos/elastic/kibana/issues/$PR_NUMBER/comments -F body="Backport result\n\n\`\`\`\n$(cat output.log)\n\`\`\`"
+          COMMENT="$(printf "Backport result\n\n\`\`\`\n$(cat output.log)\n\`\`\`")"
+          GITHUB_TOKEN="${{ secrets.KIBANAMACHINE_TOKEN }}" gh api -X POST repos/elastic/kibana/issues/$PR_NUMBER/comments -F body="$COMMENT"
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
