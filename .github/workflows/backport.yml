@@ -9,15 +9,10 @@ on:
 jobs:
   backport:
     name: Backport
-    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'wip-auto-backport')
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'auto-backport')
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Checkout code
-      #   uses: actions/checkout@v2
-      #   with:
-      #     ref: 'master'
-
       - name: 'Get backport config'
         run: |
           curl 'https://raw.githubusercontent.com/elastic/kibana/master/.backportrc.json' > .backportrc.json
@@ -27,13 +22,8 @@ jobs:
         with:
           node-version: 14.x
 
-      - run: npm install -g backport
-
-      # - name: Labels
-      #   run: |
-      #     echo "$PR_LABELS"
-      #   env:
-      #     PR_LABELS: ${{ toJSON(github.event.pull_request.labels) }}
+      - name: Install backport CLI
+        run: npm install -g backport@5.6.4
 
       - name: Backport PR
         run: |
@@ -46,7 +36,11 @@ jobs:
 
       - name: Report backport status
         run: |
-          COMMENT="$(printf "Backport result\n\n\`\`\`\n$(cat output.log)\n\`\`\`")"
+          COMMENT="Backport result
+          \`\`\`
+          $(cat output.log)
+          \`\`\`"
+
           GITHUB_TOKEN="${{ secrets.KIBANAMACHINE_TOKEN }}" gh api -X POST repos/elastic/kibana/issues/$PR_NUMBER/comments -F body="$COMMENT"
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
